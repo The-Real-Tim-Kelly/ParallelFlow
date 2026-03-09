@@ -1,0 +1,74 @@
+name: Build and Test
+
+# Trigger the workflow on push to any branch and on pull requests
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+# Set minimal permissions for security
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build, Test, and Package
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Step 1: Checkout the repository code
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for better analysis
+
+    # Step 2: Setup .NET 10 SDK
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        
+    # Step 3: Display .NET version for debugging
+    - name: Display .NET version
+      run: dotnet --version
+
+    # Step 4: Restore NuGet packages
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # Step 5: Verify code formatting (optional but recommended)
+    # This ensures consistent code style across the project
+    - name: Verify code formatting
+      run: dotnet format --verify-no-changes --verbosity diagnostic
+      continue-on-error: false
+
+    # Step 6: Build the solution in Release configuration
+    - name: Build solution
+      run: dotnet build --configuration Release --no-restore
+
+    # Step 7: Run all unit tests
+    # Tests must pass for the pipeline to succeed
+    - name: Run tests
+      run: dotnet test --configuration Release --no-build --verbosity normal
+
+    # Step 8: Check for vulnerable NuGet packages
+    # This helps maintain security by detecting known vulnerabilities
+    - name: Check for vulnerable packages
+      run: dotnet list package --vulnerable --include-transitive
+      continue-on-error: false
+
+    # Step 9: Pack the NuGet package
+    # Generate .nupkg file without publishing
+    - name: Pack NuGet package
+      run: dotnet pack --configuration Release --no-build --output ./artifacts
+
+    # Step 10: Upload the generated package as a build artifact
+    # This allows downloading the package from the Actions run
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: parallelflow-package
+        path: ./artifacts/*.nupkg
+        retention-days: 30  # Keep artifacts for 30 days
+        if-no-files-found: error  # Fail if no package was generated
