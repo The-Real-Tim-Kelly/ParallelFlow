@@ -12,7 +12,7 @@ public sealed class ParallelEnumerableExtensionsTests
         var source = Enumerable.Range(1, 100);
 
         var results = await source.SelectParallelAsync(
-            async x => 
+            async x =>
             {
                 await Task.Delay(1);
                 return x * 2;
