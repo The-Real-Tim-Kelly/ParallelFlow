@@ -19,7 +19,7 @@ public sealed class ParallelEnumerableExtensionsTests
             },
             maxDegreeOfParallelism: 10);
 
-        Assert.AreEqual(100, results.Count);
+        Assert.HasCount(100, results);
         for (int i = 0; i < 100; i++)
         {
             Assert.AreEqual((i + 1) * 2, results[i]);
@@ -73,8 +73,8 @@ public sealed class ParallelEnumerableExtensionsTests
             },
             maxDegreeOfParallelism: 5);
 
-        Assert.IsTrue(maxObservedConcurrency <= 5);
-        Assert.IsTrue(maxObservedConcurrency > 1, "Should have used parallelism");
+        Assert.IsLessThanOrEqualTo(5, maxObservedConcurrency);
+        Assert.IsGreaterThan(1, maxObservedConcurrency, "Should have used parallelism");
     }
 
     [TestMethod]
@@ -159,7 +159,7 @@ public sealed class ParallelEnumerableExtensionsTests
             async x => x * 2,
             maxDegreeOfParallelism: 5);
 
-        Assert.AreEqual(0, results.Count);
+        Assert.IsEmpty(results);
     }
 
     [TestMethod]
@@ -176,7 +176,7 @@ public sealed class ParallelEnumerableExtensionsTests
             },
             maxDegreeOfParallelism: 10);
 
-        Assert.AreEqual(50, processedItems.Count);
+        Assert.HasCount(50, processedItems);
         CollectionAssert.AreEquivalent(source.ToList(), processedItems.ToList());
     }
 
@@ -209,8 +209,8 @@ public sealed class ParallelEnumerableExtensionsTests
             },
             maxDegreeOfParallelism: 5);
 
-        Assert.IsTrue(maxObservedConcurrency <= 5);
-        Assert.IsTrue(maxObservedConcurrency > 1, "Should have used parallelism");
+        Assert.IsLessThanOrEqualTo(5, maxObservedConcurrency);
+        Assert.IsGreaterThan(1, maxObservedConcurrency, "Should have used parallelism");
     }
 
     [TestMethod]
@@ -289,9 +289,9 @@ public sealed class ParallelEnumerableExtensionsTests
 
         var batches = source.Batch(100).ToList();
 
-        Assert.AreEqual(10, batches.Count);
-        Assert.AreEqual(100, batches[0].Count);
-        Assert.AreEqual(100, batches[9].Count);
+        Assert.HasCount(10, batches);
+        Assert.HasCount(100, batches[0]);
+        Assert.HasCount(100, batches[9]);
     }
 
     [TestMethod]
@@ -301,9 +301,9 @@ public sealed class ParallelEnumerableExtensionsTests
 
         var batches = source.Batch(100).ToList();
 
-        Assert.AreEqual(2, batches.Count);
-        Assert.AreEqual(100, batches[0].Count);
-        Assert.AreEqual(5, batches[1].Count);
+        Assert.HasCount(2, batches);
+        Assert.HasCount(100, batches[0]);
+        Assert.HasCount(5, batches[1]);
     }
 
     [TestMethod]
@@ -327,7 +327,7 @@ public sealed class ParallelEnumerableExtensionsTests
 
         var batches = source.Batch(10).ToList();
 
-        Assert.AreEqual(0, batches.Count);
+        Assert.IsEmpty(batches);
     }
 
     [TestMethod]
@@ -337,7 +337,7 @@ public sealed class ParallelEnumerableExtensionsTests
 
         var batches = source.Batch(1).ToList();
 
-        Assert.AreEqual(5, batches.Count);
+        Assert.HasCount(5, batches);
         Assert.AreEqual(1, batches[0][0]);
         Assert.AreEqual(5, batches[4][0]);
     }
@@ -389,7 +389,7 @@ public sealed class ParallelEnumerableExtensionsTests
                 },
                 maxDegreeOfParallelism: 5);
 
-        Assert.AreEqual(10, batchResults.Count);
+        Assert.HasCount(10, batchResults);
 
         var expectedSum = Enumerable.Range(1, 500).Sum();
         var actualSum = batchResults.Sum();
@@ -457,7 +457,7 @@ public sealed class ParallelEnumerableExtensionsTests
             },
             maxDegreeOfParallelism: 3);
 
-        Assert.AreEqual(5, results.Count);
+        Assert.HasCount(5, results);
         CollectionAssert.AreEqual(new[] { 2, 4, 6, 8, 10 }, results);
     }
 
@@ -494,7 +494,7 @@ public sealed class ParallelEnumerableExtensionsTests
             },
             maxDegreeOfParallelism: 1);
 
-        Assert.AreEqual(10, processOrder.Count);
+        Assert.HasCount(10, processOrder);
     }
 
     [TestMethod]
@@ -506,7 +506,7 @@ public sealed class ParallelEnumerableExtensionsTests
             async x => await Task.FromResult(x * 2),
             maxDegreeOfParallelism: 5);
 
-        Assert.AreEqual(1, results.Count);
+        Assert.HasCount(1, results);
         Assert.AreEqual(84, results[0]);
     }
 
@@ -523,7 +523,7 @@ public sealed class ParallelEnumerableExtensionsTests
             },
             maxDegreeOfParallelism: 3);
 
-        Assert.AreEqual(5, results.Count);
+        Assert.HasCount(5, results);
         Assert.IsNull(results[0]);
         Assert.AreEqual(2, results[1]);
         Assert.IsNull(results[2]);
@@ -540,7 +540,7 @@ public sealed class ParallelEnumerableExtensionsTests
             async item => await Task.FromResult(new { Name = item, Length = item.Length }),
             maxDegreeOfParallelism: 2);
 
-        Assert.AreEqual(3, results.Count);
+        Assert.HasCount(3, results);
         Assert.AreEqual("apple", results[0].Name);
         Assert.AreEqual(5, results[0].Length);
         Assert.AreEqual("banana", results[1].Name);
@@ -556,7 +556,7 @@ public sealed class ParallelEnumerableExtensionsTests
             async x => await Task.FromResult(x * 2),
             maxDegreeOfParallelism: 100);
 
-        Assert.AreEqual(100, results.Count);
+        Assert.HasCount(100, results);
         for (int i = 0; i < 100; i++)
         {
             Assert.AreEqual((i + 1) * 2, results[i]);
@@ -572,7 +572,7 @@ public sealed class ParallelEnumerableExtensionsTests
             x => Task.FromResult(x * 3),
             maxDegreeOfParallelism: 5);
 
-        Assert.AreEqual(10, results.Count);
+        Assert.HasCount(10, results);
         for (int i = 0; i < 10; i++)
         {
             Assert.AreEqual((i + 1) * 3, results[i]);
@@ -594,7 +594,7 @@ public sealed class ParallelEnumerableExtensionsTests
             },
             maxDegreeOfParallelism: 1);
 
-        Assert.AreEqual(10, processedItems.Count);
+        Assert.HasCount(10, processedItems);
     }
 
     [TestMethod]
@@ -645,7 +645,7 @@ public sealed class ParallelEnumerableExtensionsTests
             },
             maxDegreeOfParallelism: 50);
 
-        Assert.AreEqual(100, processedItems.Count);
+        Assert.HasCount(100, processedItems);
     }
 
     [TestMethod]
@@ -662,7 +662,7 @@ public sealed class ParallelEnumerableExtensionsTests
             },
             maxDegreeOfParallelism: 5);
 
-        Assert.AreEqual(10, processedItems.Count);
+        Assert.HasCount(10, processedItems);
     }
 
     [TestMethod]
@@ -672,8 +672,8 @@ public sealed class ParallelEnumerableExtensionsTests
 
         var batches = source.Batch(10).ToList();
 
-        Assert.AreEqual(1, batches.Count);
-        Assert.AreEqual(5, batches[0].Count);
+        Assert.HasCount(1, batches);
+        Assert.HasCount(5, batches[0]);
         CollectionAssert.AreEqual(new[] { 1, 2, 3, 4, 5 }, batches[0]);
     }
 
@@ -684,8 +684,8 @@ public sealed class ParallelEnumerableExtensionsTests
 
         var batches = source.Batch(10).ToList();
 
-        Assert.AreEqual(1, batches.Count);
-        Assert.AreEqual(10, batches[0].Count);
+        Assert.HasCount(1, batches);
+        Assert.HasCount(10, batches[0]);
     }
 
     [TestMethod]
@@ -697,8 +697,8 @@ public sealed class ParallelEnumerableExtensionsTests
         var firstEnumeration = batchedSource.ToList();
         var secondEnumeration = batchedSource.ToList();
 
-        Assert.AreEqual(4, firstEnumeration.Count);
-        Assert.AreEqual(4, secondEnumeration.Count);
+        Assert.HasCount(4, firstEnumeration);
+        Assert.HasCount(4, secondEnumeration);
 
         for (int i = 0; i < firstEnumeration.Count; i++)
         {
@@ -713,8 +713,8 @@ public sealed class ParallelEnumerableExtensionsTests
 
         var batches = source.Batch(5).ToList();
 
-        Assert.AreEqual(1, batches.Count);
-        Assert.AreEqual(1, batches[0].Count);
+        Assert.HasCount(1, batches);
+        Assert.HasCount(1, batches[0]);
         Assert.AreEqual(42, batches[0][0]);
     }
 
@@ -730,9 +730,9 @@ public sealed class ParallelEnumerableExtensionsTests
 
         var batches = source.Batch(2).ToList();
 
-        Assert.AreEqual(2, batches.Count);
-        Assert.AreEqual(2, batches[0].Count);
-        Assert.AreEqual(1, batches[1].Count);
+        Assert.HasCount(2, batches);
+        Assert.HasCount(2, batches[0]);
+        Assert.HasCount(1, batches[1]);
         Assert.AreEqual("C", batches[1][0].Name);
     }
 
@@ -755,7 +755,7 @@ public sealed class ParallelEnumerableExtensionsTests
         var result = batches.ToList();
 
         Assert.AreEqual(10, evaluationCount);
-        Assert.AreEqual(4, result.Count);
+        Assert.HasCount(4, result);
     }
 
     [TestMethod]
@@ -774,7 +774,7 @@ public sealed class ParallelEnumerableExtensionsTests
                 },
                 maxDegreeOfParallelism: 3);
 
-        Assert.AreEqual(10, processedBatches.Count);
+        Assert.HasCount(10, processedBatches);
         Assert.IsTrue(processedBatches.All(count => count == 10));
     }
 
@@ -792,7 +792,7 @@ public sealed class ParallelEnumerableExtensionsTests
                 maxDegreeOfParallelism: 5))
             .Unwrap();
 
-        Assert.AreEqual(20, results.Count);
+        Assert.HasCount(20, results);
         Assert.AreEqual(12, results[0]); // (1 * 2) + 10
         Assert.AreEqual(50, results[19]); // (20 * 2) + 10
     }
@@ -848,7 +848,7 @@ public sealed class ParallelEnumerableExtensionsTests
             async x => await Task.FromResult(x % 2 == 0),
             maxDegreeOfParallelism: 20);
 
-        Assert.AreEqual(10000, results.Count);
+        Assert.HasCount(10000, results);
         Assert.AreEqual(5000, results.Count(x => x));
     }
 
@@ -880,8 +880,8 @@ public sealed class ParallelEnumerableExtensionsTests
 
         var batches = source.Batch(1000000).ToList();
 
-        Assert.AreEqual(1, batches.Count);
-        Assert.AreEqual(10, batches[0].Count);
+        Assert.HasCount(1, batches);
+        Assert.HasCount(10, batches[0]);
     }
 
     [TestMethod]
@@ -914,7 +914,7 @@ public sealed class ParallelEnumerableExtensionsTests
             async x => await Task.FromResult(x * 2),
             maxDegreeOfParallelism: 5);
 
-        Assert.AreEqual(10, results.Count);
+        Assert.HasCount(10, results);
     }
 
     [TestMethod]
@@ -976,8 +976,8 @@ public sealed class ParallelEnumerableExtensionsTests
             },
             maxDegreeOfParallelism: 5);
 
-        Assert.AreEqual(10, batchSums.Count);
-        Assert.AreEqual(10, processedResults.Count);
+        Assert.HasCount(10, batchSums);
+        Assert.HasCount(10, processedResults);
 
         // Verify the total sum is correct
         var expectedTotal = Enumerable.Range(1, 100).Sum();
@@ -994,7 +994,7 @@ public sealed class ParallelEnumerableExtensionsTests
             async x => await Task.FromResult(x * 10),
             maxDegreeOfParallelism: 3);
 
-        Assert.AreEqual(10, results.Count);
+        Assert.HasCount(10, results);
         CollectionAssert.AreEqual(new[] { 10, 20, 20, 30, 30, 30, 40, 40, 40, 40 }, results);
     }
 
@@ -1005,7 +1005,7 @@ public sealed class ParallelEnumerableExtensionsTests
 
         var batches = source.Batch(5).ToList();
 
-        Assert.AreEqual(4, batches.Count);
+        Assert.HasCount(4, batches);
         Assert.AreEqual(-10, batches[0][0]);
         Assert.AreEqual(9, batches[3][4]);
     }
